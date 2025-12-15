@@ -29,10 +29,66 @@ awards: una stringa
 nationality: una stringa tra un insieme definito di valori.
 Le nazionalità accettate sono: American, British, Australian, Israeli-American, South African, French, Indian, Israeli, Spanish, South Korean, Chinese.
  */
-type Nationality = "American"| "British"| "Australian"| "Israeli-American"| "South African"| "French"| "Indian"| "Israeli"| "Spanish"| "South Korean"| "Chinese"
+type Nationality =  "American"| "British"| "Australian"| "Israeli-American"| "South African"| "French"| "Indian"| "Israeli"| "Spanish"| "South Korean"| "Chinese"
+
+const nazioni: string[] = ["American", "British", "Australian", "Israeli-American", "South African", "French", "Indian", "Israeli", "Spanish", "South Korean", "Chinese"]
 
 type Actress = Person & {
   most_famous_movies: [string , string , string],
 awards: string,
 nationality: Nationality
 }
+
+/**📌 Milestone 3
+Crea una funzione getActress che, dato un id, effettua una chiamata a:
+
+GET /actresses/:id
+La funzione deve restituire l’oggetto Actress, se esiste, oppure null se non trovato.
+
+Utilizza un type guard chiamato isActress per assicurarti che la struttura del dato ricevuto sia corretta.
+
+http://localhost:3333/actresses/:id
+ */
+
+function isActress(dati:unknown): dati is Actress {
+  if(
+    dati && typeof dati === "object" &&
+    "most_famous_movies" in dati &&
+    Array.isArray(dati.most_famous_movies) && 
+    dati.most_famous_movies.length === 3 &&
+    "awards" in dati && 
+    typeof dati.awards === "string" &&
+    "nationality" in dati &&
+    typeof dati.nationality === "string" && nazioni.includes(dati.nationality)
+  ){
+    return true
+  }else{
+    return false
+  }
+
+  
+  
+}
+
+
+async function getActress(id:number): Promise<Actress | null>  {
+  try{
+
+    const response = await fetch(`http://localhost:3333/actresses/${id}`)
+    const result =  await response.json() 
+
+    if(isActress(result)){
+
+      return result}
+
+      return result
+
+    }catch(error:unknown){
+      if(typeof error === "string"){
+        throw new Error(`errore nella chiamata ${error}`)
+        
+      }else{
+      return null
+    }
+  
+}}
