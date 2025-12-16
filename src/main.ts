@@ -102,7 +102,7 @@ La funzione deve restituire un array di oggetti Actress.
 Può essere anche un array vuoto.
  */
 
-async function getAllActresses(): Promise<Actress[] | null> {
+async function getAllActresses(): Promise<Actress[]> {
   try{
   const response = await fetch(`http://localhost:3333/actresses`)
   const data: unknown = await response.json()
@@ -110,7 +110,7 @@ async function getAllActresses(): Promise<Actress[] | null> {
     const filterActress = data.filter(d=> isActress(d))
     return filterActress
   }else{
-    return null
+    return []
   }
    
    
@@ -138,8 +138,18 @@ La funzione deve restituire un array contenente elementi di tipo Actress oppure 
 
 
 async function getActresses(array: number[]): Promise<(Actress | null)[]> {
-  const promises = array.map(id => getActress(id));
-  return Promise.all(promises);
+  try{
+      const promises = array.map(id => getActress(id));
+      const actresses =  await Promise.all(promises);
+      return actresses
+    }catch(error:unknown){
+      if(error instanceof Error){
+        console.error("errore tipo:"+error)
+        return []
+      }else{
+        throw new Error ("errore generico tipo"+error)
+      }
+    }
 }
 
 /**
