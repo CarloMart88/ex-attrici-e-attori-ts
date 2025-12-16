@@ -162,3 +162,20 @@ Utilizza gli Utility Types:
 
 Omit: per creare un'attrice senza passare id, che verrà generato casualmente.
 Partial: per permettere l’aggiornamento di qualsiasi proprietà tranne id e name. */
+
+function createActress(dati: Omit<Actress , "id">): Actress {
+  return {
+    ...dati,
+    id: Math.floor(Math.random() * 10000)
+  }
+  
+}
+
+function updateActress(actress: Actress, update: Partial<Actress> ):Actress {
+  return {
+    ...actress,
+    ...update,
+    id: actress.id,
+    name: actress.name
+  }
+}
