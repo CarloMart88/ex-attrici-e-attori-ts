@@ -255,3 +255,38 @@ async function getAllActors(): Promise<Actor[]> {
   
 }
 
+async function getActors(ids:number[]):Promise<(Actor | null)[]> {
+  try{
+  const promises = ids.map(id => getActor(id))
+  const actors = await Promise.all(promises)
+  return actors
+
+    }catch(error:unknown){
+      if(error instanceof Error){
+        console.error("errore tipo:"+error)
+        return []
+      }else{
+      throw new Error("errore generico");
+      
+    }
+    }
+   
+  
+}
+
+function createActor(dati: Omit<Actor , "id">): Actor {
+  return {
+    ...dati,
+    id: Math.floor(Math.random() * 10000)
+  }
+  
+}
+
+function updateActor(actor: Actor, update: Partial<Actor> ):Actor {
+  return {
+    ...actor,
+    ...update,
+    id: actor.id,
+    name: actor.name
+  }
+}
