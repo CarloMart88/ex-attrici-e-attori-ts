@@ -75,16 +75,16 @@ async function getActress(id:number): Promise<Actress | null>  {
   try{
 
     const response = await fetch(`http://localhost:3333/actresses/${id}`)
-    const result =  await response.json() 
+    const result: unknown =  await response.json() 
 
-    if(isActress(result)){
-
-      return result}
+    if(!isActress(result)){
+      throw new Error("formato dei dati non valido")
+    }
 
       return result
 
     }catch(error:unknown){
-      if(typeof error === "string"){
+      if( error instanceof Error){
         throw new Error(`errore nella chiamata ${error}`)
         
       }else{
@@ -137,23 +137,18 @@ La funzione deve restituire un array contenente elementi di tipo Actress oppure 
 
 
 
-async function getActresses(array : number[]): Promise<Actress[] | null>  {
-  const promises : any = array.map(a =>  getActress(a))
-  try{
-  const result: unknown =  await Promise.all(promises)
-  if(result === null){
-    console.log("non ci sono valori corrispondenti")
-    return null
-  }else if(result instanceof Array ){
-    return result
-  }
+async function getActresses(array: number[]): Promise<(Actress | null)[]> {
+  const promises = array.map(id => getActress(id));
+  return Promise.all(promises);
+}
 
+/**
+🎯 BONUS 1
+Crea le funzioni:
 
- }catch(error: unknown){
-  if(typeof error === "string"){
-  throw new Error("errore:"+ error)
-    return null}
-  else{
-    throw new Error("error diverso da stringa")}
-  }
- }
+createActress
+updateActress
+Utilizza gli Utility Types:
+
+Omit: per creare un'attrice senza passare id, che verrà generato casualmente.
+Partial: per permettere l’aggiornamento di qualsiasi proprietà tranne id e name. */
