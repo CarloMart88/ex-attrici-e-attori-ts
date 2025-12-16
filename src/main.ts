@@ -119,7 +119,7 @@ async function getAllActresses(): Promise<Actress[]> {
         throw new Error(`errore nella chiamata ${error}`)
         
       }else{
-      return null
+      return []
     }
   
 }
@@ -179,3 +179,79 @@ function updateActress(actress: Actress, update: Partial<Actress> ):Actress {
     name: actress.name
   }
 }
+
+/**🎯 BONUS 2
+Crea un tipo Actor, che estende Person con le seguenti differenze rispetto ad Actress:
+
+known_for: una tuple di 3 stringhe
+awards: array di una o due stringhe
+nationality: le stesse di Actress più:
+Scottish, New Zealand, Hong Kong, German, Canadian, Irish.
+Implementa anche le versioni getActor, getAllActors, getActors, createActor, updateActor. 
+http://localhost:3333/actors/:id*/
+
+type ActorNationality = Nationality |  "Scottish"| "New Zealand"| "Hong Kong"| "German"| "Canadian"| "Irish"
+
+type Actor = Person & {
+  known_for: [string ,string , string ],
+  awards: [string] | [string , string], 
+  nationality: ActorNationality
+}
+
+function isActor(dati:unknown): dati is Actor {
+  if(
+    dati && typeof dati === "object" &&
+    "known_for" in dati &&
+    Array.isArray(dati.known_for) && 
+    dati.known_for.length === 3 &&
+    "awards" in dati && 
+    Array.isArray(dati.awards) && (dati.awards.length === 1 || dati.awards.length === 2) &&
+    "nationality" in dati &&
+    typeof dati.nationality === "string" && nazioni.includes(dati.nationality)
+  ){
+    return true
+  }else{
+    return false
+  }
+
+  
+  
+}
+
+async function getActor(id:number):Promise<Actor | null> {
+  try{
+    const response = await fetch(`http://localhost:3333/actors/${id}`)
+    const result: unknown =  await response.json()
+    if(!isActor(result)){
+      throw new Error("errore nella chiamata")
+    }else{
+      return result
+    }
+  
+  }catch(error:unknown){
+    if(error instanceof Error){
+      throw new Error("errrore tipo:"+error)
+    }else{
+      return null
+    }
+    }
+
+  
+}
+
+async function getAllActors(): Promise<Actor[]> {
+  try{
+    const response = await fetch(`http://localhost:3333/actors`)
+    const result = await response.json()
+    const filteredResult = result.filter(isActor)
+    return filteredResult
+  }catch(error:unknown){
+    if(error instanceof Error){
+      throw new Error("errrore tipo:"+error)
+    }else{
+      return []
+    }
+    }
+  
+}
+
